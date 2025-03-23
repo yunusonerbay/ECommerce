@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ECommerce.Application.ExternalServices;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Exceptions;
+using ECommerce.Infrastructure.Models;
 using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Infrastructure.Services
@@ -159,29 +160,5 @@ namespace ECommerce.Infrastructure.Services
             }
         }
 
-        private class BaseResponse
-        {
-            public bool Success { get; set; }
-        }
-
-        private class ProductsResponse : BaseResponse
-        {
-            public List<Product> Data { get; set; } = new List<Product>();
-        }
-
-        private class BalanceResponse : BaseResponse
-        {
-            public Balance? Data { get; set; }
-        }
-
-        private class PreorderResponse : BaseResponse
-        {
-            public PreorderData? Data { get; set; }
-        }
-
-        private class PreorderData
-        {
-            public string TransactionId { get; set; } = default!;
-        }
     }
 }
