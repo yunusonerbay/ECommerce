@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using ECommerce.Application.Interfaces;
+using ECommerce.Application.ExternalServices;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Infrastructure.Repositories

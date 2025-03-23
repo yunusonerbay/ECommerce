@@ -5,7 +5,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using ECommerce.Application.Interfaces;
+using ECommerce.Application.ExternalServices;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -52,6 +52,33 @@ namespace ECommerce.Infrastructure.Services
             {
                 _logger.LogError(ex, "Error fetching products from Balance Management API");
                 throw new DomainException($"Failed to retrieve products: {ex.Message}");
+            }
+        }
+
+        public async Task<Balance> GetBalanceAsync()
+        {
+            try
+            {
+                _logger.LogInformation("Fetching balance information");
+
+                var response = await _httpClient.GetAsync("/api/balance");
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var responseObject = JsonSerializer.Deserialize<BalanceResponse>(responseContent, _jsonOptions);
+
+                if (responseObject?.Success != true || responseObject.Data == null)
+                {
+                    _logger.LogWarning("API returned unsuccessful response or null data");
+                    throw new DomainException("Failed to retrieve balance information");
+                }
+
+                return responseObject.Data;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Error fetching balance from Balance Management API");
+                throw new DomainException($"Failed to retrieve balance: {ex.Message}");
             }
         }
 
@@ -140,6 +167,11 @@ namespace ECommerce.Infrastructure.Services
         private class ProductsResponse : BaseResponse
         {
             public List<Product> Data { get; set; } = new List<Product>();
+        }
+
+        private class BalanceResponse : BaseResponse
+        {
+            public Balance? Data { get; set; }
         }
 
         private class PreorderResponse : BaseResponse

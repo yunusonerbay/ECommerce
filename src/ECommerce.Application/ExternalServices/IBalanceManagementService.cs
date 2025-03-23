@@ -1,15 +1,13 @@
-﻿using ECommerce.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using ECommerce.Domain.Entities;
 
-namespace ECommerce.Application.Interfaces
+namespace ECommerce.Application.ExternalServices
 {
     public interface IBalanceManagementService
     {
         Task<IEnumerable<Product>> GetProductsAsync();
+        Task<Balance> GetBalanceAsync();
         Task<string> CreatePreorderAsync(string buyerId, List<OrderItem> items, decimal totalAmount);
         Task CompleteOrderAsync(string transactionId);
     }

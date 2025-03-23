@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using ECommerce.Application.DTOs;
+using ECommerce.Application.ExternalServices;
 using ECommerce.Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
