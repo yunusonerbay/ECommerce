@@ -7,8 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace ECommerce.WebApi.Controllers
 {
+    /// <summary>
+    /// Products API - Manages product information and availability
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -34,9 +38,9 @@ namespace ECommerce.WebApi.Controllers
         }
 
         /// <summary>
-        /// Get product by ID
+        /// Get product by Id
         /// </summary>
-        /// <param name="id">Product ID</param>
+        /// <param name="id">Product Id</param>
         /// <returns>Product details</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ProductDto), 200)]

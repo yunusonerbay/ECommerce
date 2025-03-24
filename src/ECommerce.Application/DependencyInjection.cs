@@ -11,6 +11,7 @@ namespace ECommerce.Application
             // Register application services
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IBalanceService, BalanceService>();
+            services.AddScoped<IOrderService, OrderService>();
 
             return services;
         }

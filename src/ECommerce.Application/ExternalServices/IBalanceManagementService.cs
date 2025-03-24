@@ -8,7 +8,7 @@ namespace ECommerce.Application.ExternalServices
     {
         Task<IEnumerable<Product>> GetProductsAsync();
         Task<Balance> GetBalanceAsync();
-        Task<string> CreatePreorderAsync(string buyerId, List<OrderItem> items, decimal totalAmount);
-        Task CompleteOrderAsync(string transactionId);
+        Task<bool> CreatePreorderAsync(string orderId, decimal amount);
+        Task<bool> CompleteOrderAsync(string orderId);
     }
 }

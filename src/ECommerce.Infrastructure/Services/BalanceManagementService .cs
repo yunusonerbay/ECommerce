@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using ECommerce.Application.ExternalServices;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Exceptions;
-using ECommerce.Infrastructure.Models;
+using ECommerce.Infrastructure.Models.ApiResponses;
 using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Infrastructure.Services
@@ -83,22 +83,16 @@ namespace ECommerce.Infrastructure.Services
             }
         }
 
-        public async Task<string> CreatePreorderAsync(string buyerId, List<OrderItem> items, decimal totalAmount)
+        public async Task<bool> CreatePreorderAsync(string orderId, decimal amount)
         {
             try
             {
-                _logger.LogInformation("Creating preorder with Balance Management API for buyer {BuyerId}", buyerId);
+                _logger.LogInformation("Creating preorder with Balance Management API for order {OrderId}, amount: {Amount}", orderId, amount);
 
                 var requestData = new
                 {
-                    BuyerId = buyerId,
-                    Items = items.Select(i => new
-                    {
-                        ProductId = i.ProductId,
-                        Quantity = i.Quantity,
-                        UnitPrice = i.UnitPrice
-                    }).ToList(),
-                    TotalAmount = totalAmount
+                    orderId = orderId,
+                    amount = amount
                 };
 
                 var content = new StringContent(
@@ -106,7 +100,7 @@ namespace ECommerce.Infrastructure.Services
                     Encoding.UTF8,
                     "application/json");
 
-                var response = await _httpClient.PostAsync("/api/preorder", content);
+                var response = await _httpClient.PostAsync("/api/balance/preorder", content);
                 response.EnsureSuccessStatusCode();
 
                 var responseContent = await response.Content.ReadAsStringAsync();
@@ -114,10 +108,14 @@ namespace ECommerce.Infrastructure.Services
 
                 if (responseObject?.Success != true || responseObject.Data == null)
                 {
+                    _logger.LogWarning("API returned unsuccessful response or null data");
                     throw new PaymentFailedException("API returned unsuccessful response or null data");
                 }
 
-                return responseObject.Data.TransactionId;
+                _logger.LogInformation("Preorder created successfully for order {OrderId}, status: {Status}",
+                    responseObject.Data.PreOrder?.OrderId, responseObject.Data.PreOrder?.Status);
+
+                return true;
             }
             catch (HttpRequestException ex)
             {
@@ -126,15 +124,15 @@ namespace ECommerce.Infrastructure.Services
             }
         }
 
-        public async Task CompleteOrderAsync(string transactionId)
+        public async Task<bool> CompleteOrderAsync(string orderId)
         {
             try
             {
-                _logger.LogInformation("Completing order with Balance Management API, transaction ID: {TransactionId}", transactionId);
+                _logger.LogInformation("Completing order with Balance Management API, order ID: {OrderId}", orderId);
 
                 var requestData = new
                 {
-                    TransactionId = transactionId
+                    orderId = orderId
                 };
 
                 var content = new StringContent(
@@ -142,16 +140,22 @@ namespace ECommerce.Infrastructure.Services
                     Encoding.UTF8,
                     "application/json");
 
-                var response = await _httpClient.PostAsync("/api/complete", content);
+                var response = await _httpClient.PostAsync("/api/balance/complete", content);
                 response.EnsureSuccessStatusCode();
 
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var responseObject = JsonSerializer.Deserialize<BaseResponse>(responseContent, _jsonOptions);
+                var responseObject = JsonSerializer.Deserialize<CompleteOrderResponse>(responseContent, _jsonOptions);
 
-                if (responseObject?.Success != true)
+                if (responseObject?.Success != true || responseObject.Data == null)
                 {
-                    throw new PaymentFailedException("API returned unsuccessful response");
+                    _logger.LogWarning("API returned unsuccessful response or null data");
+                    throw new PaymentFailedException("API returned unsuccessful response or null data");
                 }
+
+                _logger.LogInformation("Order completed successfully: {OrderId}, status: {Status}",
+                    responseObject.Data.Order?.OrderId, responseObject.Data.Order?.Status);
+
+                return true;
             }
             catch (HttpRequestException ex)
             {
