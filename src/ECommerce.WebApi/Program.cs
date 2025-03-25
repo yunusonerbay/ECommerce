@@ -55,6 +55,9 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderDtoValidator>();
 
+builder.WebHost.UseUrls("http://+:8080");
+
+
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -69,11 +72,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
