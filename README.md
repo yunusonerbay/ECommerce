@@ -42,8 +42,9 @@ The API is documented using Swagger/OpenAPI. When running the application, navig
 ### Prerequisites
 - .NET 9.0 SDK
 - Visual Studio 2022 or any other code editor
+- Docker Desktop (for containerized run)
 
-### Running the Application
+### Running the Application Locally (Without Docker)
 1. Clone the repository
 2. Navigate to the project directory
 3. Run `dotnet restore` to restore dependencies
@@ -51,12 +52,12 @@ The API is documented using Swagger/OpenAPI. When running the application, navig
 5. Run `dotnet run --project src/ECommerce.WebApi/ECommerce.WebApi.csproj` to start the API server
 6. Open a browser and navigate to `https://localhost:5001/swagger` to view the API documentation
 
-## Design Patterns
+---
 
-The application uses several design patterns:
+## 🐳 Running the Application with Docker
 
-- **Repository Pattern**: For data access abstraction
-- **Unit of Work**: For transaction management
-- **Dependency Injection**: For loose coupling between components
-- **Circuit Breaker**: For handling external service failures
-- **Retry Pattern**: For transient error handling
+> Dockerfile proje kök dizinindeyse bu komutları kullanabilirsiniz:
+
+```bash
+docker build -t ecommerce-api .
+docker run -d -p 5000:8080 --name ecommerce-api ecommerce-api
